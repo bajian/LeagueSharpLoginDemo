@@ -25,5 +25,6 @@
         android:onClick="testIsLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="测试获取登录用户名"/>
+        android:text="测试获取登录用户名，可用来测试持久化登录"/>
+
 </LinearLayout>

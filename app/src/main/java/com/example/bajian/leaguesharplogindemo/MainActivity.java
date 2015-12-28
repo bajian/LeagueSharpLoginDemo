@@ -11,11 +11,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Request;
+import com.zhy.http.okhttp.OkHttpClientManager;
 import com.zhy.http.okhttp.callback.ResultCallback;
+import com.zhy.http.okhttp.component.PersistentCookieStore;
 import com.zhy.http.okhttp.request.OkHttpRequest;
 
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.HashMap;
 import java.util.Map;
+
+import okio.Buffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,11 +63,16 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         Button btn_login = (Button) findViewById(R.id.btn_login);
         setSupportActionBar(toolbar);
-/*
+        //持久化cookie
+        OkHttpClientManager.getInstance().setCookieHandler(
+                new CookieManager(new PersistentCookieStore(getApplicationContext())
+                        , CookiePolicy.ACCEPT_ORIGINAL_SERVER)
+        );
+
         OkHttpClientManager.getInstance()
                 .setCertificates(new Buffer()
                         .writeUtf8(WebCer)
-                        .inputStream());*/
+                        .inputStream());
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +83,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 //auth_key=880ea6a14ea49e853634fbdc5015a024&
-// referer=https%3A%2F%2Fwww.joduska.me%2Fforum%2F&rememberMe=1&ips_username=Mcmillian&ips_password=6047012
+// referer=https%3A%2F%2Fwww.joduska.me%2Fforum%2F
+// &rememberMe=1&ips_username=Mcmillian&ips_password=6047012
     private void getAuthKey() {
         new OkHttpRequest.Builder().url(URL_LOGIN+"?r="+Math.random()).get(new ResultCallback<String>() {
             @Override
@@ -97,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private void login(String authKey){
         Map<String, String> params = new HashMap<String, String>();
         params.put("auth_key", authKey);
-        params.put("referer", "https%3A%2F%2Fwww.joduska.me%2Fforum%2F&rememberMe=1");
+        params.put("referer", "https%3A%2F%2Fwww.joduska.me%2Fforum%2F");
         params.put("rememberMe", "1");
         params.put("ips_username", UNAME);
         params.put("ips_password", PWD);
@@ -123,6 +136,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 用于测试cookie持久化，就是登录后重新打开app，直接点这个按钮，看看有没登录中
+     * @param v
+     */
     public void testIsLogin(final View v){
         new OkHttpRequest.Builder().url(URL_FORUM).get(new ResultCallback<String>() {
             @Override
@@ -142,27 +159,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-/*
 
-    public void testIsLogin(final View v){
-        new OkHttpRequest.Builder().url(URL_FORUM).get(new ResultCallback<String>() {
-            @Override
-            public void onError(Request request, Exception e) {
-
-            }
-
-            @Override
-            public void onResponse(String response) {
-//                System.out.println(response);
-                String name=StringUtil.getStringMiddle(response,"https://www.joduska.me/forum/user/","/");
-                if (!"".equals(name) && name.contains(UNAME.toLowerCase()))
-                    Snackbar.make(v,"login user is"+name,Snackbar.LENGTH_LONG).show();
-                else
-                    Snackbar.make(v,"not login",Snackbar.LENGTH_LONG).show();
-            }
-        });
-    }
-*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

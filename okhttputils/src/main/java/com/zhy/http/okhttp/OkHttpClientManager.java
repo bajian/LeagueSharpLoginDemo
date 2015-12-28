@@ -37,6 +37,7 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * updated by bajian hgx
+ * 持久化cookie
  */
 public class OkHttpClientManager
 {
@@ -52,7 +53,7 @@ public class OkHttpClientManager
     {
         mOkHttpClient = new OkHttpClient();
         //cookie enabled
-        mOkHttpClient.setCookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER));
+        setCookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER));
         mDelivery = new Handler(Looper.getMainLooper());
 
         final int sdk = Build.VERSION.SDK_INT;
@@ -70,6 +71,19 @@ public class OkHttpClientManager
         }
 
 
+    }
+
+    /**
+     * 设置持久化cookie
+     * @param mCookieManager
+     * 离线自动处理
+     * new CookieManager(new PersistentCookieStore(mContext)
+    , CookiePolicy.ACCEPT_ORIGINAL_SERVER)
+    在线自动处理
+    new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER)
+     */
+    public void setCookieHandler(CookieManager mCookieManager){
+        mOkHttpClient.setCookieHandler(mCookieManager);
     }
 
     public static OkHttpClientManager getInstance()
